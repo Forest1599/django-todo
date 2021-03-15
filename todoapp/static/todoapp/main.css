@@ -1,0 +1,295 @@
+@font-face{
+    src: url(fonts/Aileron-Thin.otf);
+    font-family: title;
+}
+
+body {
+    background-color: #121212;
+    width: 60%;
+    margin: 0 auto;
+}
+
+header {
+    margin-top: 40px;
+    color: white;
+    text-align: center;
+}
+
+header h1 {
+    font-size: 50px;
+    font-family: title;
+    animation: slideDown 0.8s ease;
+}
+
+/* todo object */
+
+.todo {
+    display: grid;
+    grid-template-columns: 60% 40%;
+    margin-top: 40px;
+    height: 120px;
+    width: 100%;
+    background-color: #242424;
+    border-radius: 50px;
+    box-shadow: 5px 1px 10px rgb(0, 0, 0);
+    opacity: 0;
+    animation: slideLeft 0.8s ease;
+    animation-fill-mode: forwards;
+}
+
+.content {
+    /* display: inline-block; */
+    margin: 18px 0 0 20px;
+    color: white;
+    font-size: 20px;
+    white-space: pre-wrap;      /* CSS3 */   
+    white-space: -moz-pre-wrap; /* Firefox */    
+    white-space: -pre-wrap;     /* Opera <7 */   
+    white-space: -o-pre-wrap;   /* Opera 7 */    
+    word-wrap: break-word;      /* IE */
+}
+
+.time-created {
+    display: block;
+    margin: 5px 0 0 20px;
+    color: rgb(190, 186, 186);
+    float: left;
+    font-size: 13px;
+}
+
+.checkmark {
+    display: none;
+}
+
+/* Checkmark that can be seen */
+
+.checkmark-display {
+    margin: 35px 30px 0 0;
+    position: relative;
+    display: inline;
+    width: 50px;
+    height: 50px;
+    float:  right;
+    cursor: pointer;
+    border: solid white 2px;
+    border-radius: 50%;
+    transition: border-color 0.2s ease;
+}
+
+.checkmark-display::before {
+    content: "";
+    position: absolute;
+    left: 20%;
+    top: 45%;
+    height: 30%;
+    width: 2px;
+    background: white;
+    transform: translateX(10px) rotate(-45deg);
+    transform-origin: left bottom;
+}
+
+.checkmark-display::after {
+    content: "";
+    position: absolute;
+    left: 20%;
+    bottom: 25%;
+    height: 2px;
+    width: 55%;
+    background-color: white;
+    transform: translateX(10px) rotate(-45deg);
+    transform-origin: left bottom;
+}
+
+.checkmark-display:hover{
+    border: solid green 2px;
+    transition: border 0.2s ease;
+}
+
+.checkmark:checked  .checkmark-display{
+    border-color: green;
+}
+
+/* Details btn */
+
+.details-btn {
+    margin: 35px 30px 0 0;
+    position: relative;
+    display: inline;
+    width: 50px;
+    height: 50px;
+    float: right;
+    cursor: pointer;
+    border: solid white 2px;
+    border-radius: 50%;
+    transition: border-color 0.2s ease;
+}
+
+.fa-money-check {
+    color: white;
+    margin: 15px 0 0 13px;
+}
+
+.details-btn:hover {
+    border-color: orange;
+}
+
+.details-btn:active {
+    background-color: orange;
+}
+
+/* add button */
+
+.add-btn {
+    height: 80px;
+    width: 80px;
+    position: fixed;
+    right: 12%;
+    bottom: 15px;
+    font-size: 50px;
+    color: white;
+    border: solid 1px #007add;
+    background-color: rgb(0, 122, 221);
+    border-radius: 50%;
+    box-shadow: 5px 1px 10px black;
+    opacity: 0;
+    animation: opacityAppear 0.8s ease;
+    animation-fill-mode: forwards;
+    animation-delay: 0.3s;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.add-btn:hover {
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+    background-color: rgb(0, 99, 180);
+    border-color: rgb(0, 99, 180);
+}
+
+.add-btn p {
+    margin: -5px 0 0 0;
+    text-align: center;
+}
+
+/* Done btn */
+
+.donebtn {
+    position: fixed;
+    color: white;
+    font-size: 30px;
+    font-family: title;
+    right: 2%;
+    bottom: 15px;
+    width: 80px;
+    height: 80px;
+    border-radius: 50px;
+    background-color: rgb(0, 165, 0);
+    border: none;
+    animation: slideLeft 0.8s ease;
+    transition: background-color 0.4s ease, opacity 0.4s ease;
+}
+
+.donebtn:hover {
+    transition: background-color 0.4s ease;
+    background-color: rgb(1, 126, 1);
+}
+
+.donebtn:focus {
+    outline: none;
+}
+
+/* 1360 screen */
+
+@media only screen and (max-width: 1360px){
+    body {
+        width: 70%;
+    }
+
+    .add-btn {
+        top: 30px;
+        right: 17%;
+        position: absolute;
+    }
+}
+
+/* 890 screen */
+
+@media only screen and (max-width: 890px){
+
+    .todo {
+        display: grid;
+        grid-template-columns: 60% 40%;
+        height: 140px;
+    }
+
+    .add-btn {
+        top: 45px;
+        right: 12%;
+        height: 60px;
+        width: 60px;
+        font-size: 40px;
+    }
+
+    body {
+        width: 80%;
+    }
+
+    .content {
+        font-size: 15px;
+        margin-top: 30px;
+        width: 80%;
+    }
+    
+    .checkmark-display {
+        margin-top: 50px;
+    }
+
+    .details-btn {
+        margin-top: 50px;
+        margin-right: 10px;
+    }
+
+    .time-created {
+        display: block;
+        font-size: 12px;
+        width: 100%;
+        font-size: 11px;
+    }
+
+    .donebtn {
+        font-size: 15px;
+        width: 60px;
+        height: 60px;
+    }
+}
+
+/* Animations */
+@keyframes slideLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes opacityAppear {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+

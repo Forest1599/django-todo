@@ -1,0 +1,135 @@
+{% load static %}
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Django todo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static "todoapp/main.css" %}">
+    <script src="https://kit.fontawesome.com/992a89c32d.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+  <header>
+    <h1>Your todo</h1>
+  </header>
+
+  <form method="POST" class="todos-form">
+    {% csrf_token %}
+    <div class="todo-section">
+    {% comment %} loops through each todo {% endcomment %}
+      {% for todo in todos %}
+        {% if todo.is_due%}
+          <div class="todo {{todo.id}}todonum is-due">
+        {% else %}
+          <div class="todo {{todo.id}}todonum">
+        {% endif %}
+            <div>
+              <p class="content">{{ todo.content }}</p>
+              {% comment %} <br> {% endcomment %}
+              <p class= "time-created"> Start: {{ todo.date_created|date:"D d M Y G:i" }}</p>
+              <p class="time-created">End: {{ todo.date_end|date:"D d M Y G:i" }}</p>
+            </div>
+            <div>
+              <div class="checkmark-display {{todo.id}}"
+              onclick="checkboxFunction(event)" id="checkmark-display"></div>
+              <input type="checkbox" class="checkmark {{todo.id}}" value={{ todo.id }}
+              id="todo" name="todo">
+              <a href="{% url "todo:todo-detail" todo.id %}">
+                <div class="details-btn">
+                  <i class="fas fa-money-check"></i>
+                </div>
+              </a>
+            </div>
+          </div>
+      {% endfor %}
+  </form>
+  </div>
+
+  <a href="{% url "todo:add" %}">
+    <div class="add-btn">
+      <p>+</p>
+    </div>
+  </a>
+
+
+  <script>
+    // For removing the done button if no checkbox is selected
+    // big code lmao
+    function checkDoneBtn(){
+      var list = document.getElementsByClassName("checkmark"); // all checkmark elements
+      var doneBtn = document.getElementsByClassName("donebtn")[0];
+
+      // loops through to check if one of them is checked
+      for (let checkbox of list){
+        if (checkbox.checked == true){
+          return null
+        };
+      };
+
+      // smoothly removes the done button
+      doneBtn.style.opacity = 0;
+      setTimeout(function(){
+        doneBtn.remove();
+      }, 100);
+
+    };
+
+
+    // Creates the done button
+    function checkboxFunction(e){
+      var checkmark = document.getElementsByClassName(`${e.target.classList[1]}`)[1]
+      
+      // Creates the done button if one of the check buttons is clicked
+      if (document.getElementsByClassName("donebtn").length < 1){
+        var submit = document.createElement("input");
+        submit.type = "submit";
+        submit.className = "donebtn";
+        submit.value = "OK"
+        document.getElementsByClassName("todos-form")[0].appendChild(submit);
+      };
+
+      // Checking if the checker is checked, that is hidden
+      if (checkmark.checked == false){
+        checkmark.checked = true;
+        e.target.style.backgroundColor = "green";
+        e.target.style.borderColor = "green";
+      } else {
+        checkmark.checked = false;
+        e.target.style.backgroundColor = "transparent";
+        e.target.style.borderColor = "";
+      };
+
+      checkDoneBtn();
+    };
+
+    // Removing the alert on refresh
+    if ( window.history.replaceState ) {
+      window.history.replaceState( null, null, window.location.href );
+    };
+
+    // Delaying the animation for each element + making them red if due
+    let animationDelaySecond = 0.5
+    let todoObject = document.getElementsByClassName("todo");
+
+    for (let todo of todoObject){
+      if (todo.classList.contains("is-due")){
+        todo.style.border = "3px solid rgba(255, 0, 0, .3)"
+      }
+      document.getElementsByClassName(`${todo.classList[1]}`)[0].style.animationDelay = `${animationDelaySecond}s`      
+      animationDelaySecond += 0.1
+    };
+
+    // content margin to make it look more centered 
+    var contents = document.getElementsByClassName("content");
+    for (let content of contents){
+      if (content.innerHTML.length >= 40){
+        content.style.marginTop = "18px";
+      } else {
+        content.style.marginTop = "28px"
+      }
+    }
+    
+  </script>
+</body>
+</html>

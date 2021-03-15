@@ -1,0 +1,180 @@
+{% load static %}
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Django todo add</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <link rel="stylesheet" href="{% static "todoapp/todoadd.css" %}">
+</head>
+<body>
+    <header>
+      <h1>Add a todo</h1>
+    </header>
+    <div class="content-section">
+      <form method="POST" class="todo-form">
+        {% csrf_token %}
+        {% comment %} content field {% endcomment %}
+        <label for="content" class="content-label">Name:</label>
+        <input type="text" class="form-control form-control-lg content"
+         maxlength="45" id="content" name="content" value="{{ current_name }}"
+          autocomplete="off" autofocus spellcheck="false"
+           onkeyup="inputLengthChecker(event)" placeholder="Please input the name of the task.." required>
+        
+        {% comment %} date field {% endcomment %}
+        <label for="date-time" class="date-time-label">Pick an end date:</label>
+        <input type="datetime-local" id="date-time"
+          name="date" value="{{ current_name }}" max="9999-12-31T23:59" required>
+
+        {% comment %} details field {% endcomment %}
+        <label class="details-label">Details:</label>
+        <textarea class="details-field" name="details"
+        value="{{ current_name }}" id="details" placeholder="Please describe the task.."></textarea>
+
+        {% comment %} subtasks {% endcomment %}
+        <label for="content" class="subtask-label">Sub-tasks:</label>
+        <div class="subtasks" >
+          <div class="subtask-container 1">
+            <div class="num" id="num">•</div>
+            <input type="text" class="form-control form-control-lg subtask"
+              maxlength="45" id="subtask"
+              autocomplete="off" autofocus spellcheck="false"
+              placeholder="Sub-tasks to complete the task.." value="{{ current_name }}" name="subtask">
+          </div>
+        </div>
+
+        <div class="add-sub">
+          <div onclick="subTaskAdd()">
+            +
+          </div>
+        </div>
+
+        <div class="choiceBtns">
+          <a href="{% url "todo:home" %}"class="back-btn"><div>Back</div></a>
+          <input type="submit" value="Add" class="addBtn">
+        </div>
+
+      </form>  
+    </div>
+  <script>
+      var inputBox = document.getElementsByClassName("content");
+
+      // input length checker
+      // remember event and e.target
+      function inputLengthChecker(e){
+          let dateTime = document.getElementById("date-time"); // for margins
+        if (e.target.value.length == 45){
+          // checks if there are already elements there
+          if (document.getElementsByClassName("length-error").length == 0){
+            let lengthError = document.createElement("p");
+            lengthError.className = "length-error";
+            lengthError.textContent = "Only 45 characters are available...";
+
+            // inserts the node
+            e.target.parentNode.insertBefore(lengthError, e.target.nextSibling);
+            dateTime.style.margin = "5px 0 0 20px"
+          };
+          // makes ther border red
+          inputBox[0].style.border = "solid 2px #681919";
+          inputBox[0].style.boxShadow = "none";
+        }else {
+          // will output error
+          try {
+            document.getElementsByClassName("length-error")[0].remove()
+          }
+          catch{
+            null
+          }
+          inputBox[0].style.border = "2px solid rgba(255, 255, 255, 0.5)";
+          dateTime.style.margin = "30px 0px 0px 20px";
+        };
+      };
+
+      // For the page that it does not alert on refresh
+      if ( window.history.replaceState ) {
+      window.history.replaceState( null, null, window.location.href );
+      };
+
+      // subtask button add
+      function subTaskAdd(){
+        let parent = document.getElementsByClassName("subtasks")[0];
+        let labelNums = document.querySelectorAll(".num")[0];
+        let subtaskBox = document.getElementsByClassName("subtask")[0];
+        let subtaskContainer = document.getElementsByClassName("subtask-container");
+
+        // to remove the animation delay that is at the start
+        subtaskBox.style.animationDelay = "0.3s";
+        labelNums.style.animationDelay = "0.3s";
+
+        // clones the objects and inserts them
+        let newLabel = labelNums.cloneNode(true);
+        let newBox = subtaskBox.cloneNode(true);
+        newBox.value = ""
+
+        // the container that contains the whole todo dot + box + remove btn
+        let newContainer = subtaskContainer[0].cloneNode(true);
+        newContainer.innerHTML = '';
+        
+        // event listeners for the delete button
+        newContainer.addEventListener("mouseenter", addDelete, event);
+        newContainer.addEventListener("mouseleave", removeDelete, event);
+        
+        // appending everything to the code
+        parent.appendChild(newContainer);
+        newContainer.appendChild(newLabel);
+        newContainer.appendChild(newBox);
+
+        // changes margin so the buttons are only pushed when the todos reaches them
+        let choiceButtonBox = document.getElementsByClassName("choiceBtns")[0];
+        let marginTop = parseInt(window.getComputedStyle(choiceButtonBox).marginTop.split("p")[0]);
+
+        // stops decreasing the margin if it hits the button container
+        if (marginTop - 70 < 0){
+          choiceButtonBox.style.margin = "0px"
+        } else {
+          choiceButtonBox.style.margin = `${marginTop - 70} 0 0 0`
+        };
+      };
+
+      // adds x for each button that is hovered on
+      function addDelete(e){
+        let deleteSubBtn = document.createElement("div"); // creates the x instance
+        deleteSubBtn.className = "delete-sub-btn";
+        
+        // adds event listener to remove the subtask
+        deleteSubBtn.addEventListener("click", deleteSub, event)
+        e.target.appendChild(deleteSubBtn); // adds the instance 
+      };
+
+      // removes the delete instance
+      function removeDelete(e){
+        // gets the target that is hovered on and removes the last child (x)
+        e.target.removeChild(e.target.lastChild); 
+      };
+      
+      // deletes the subtask
+      function deleteSub(e){
+
+        // changes margin so the buttons are only pushed when the todos reaches them
+        let choiceButtonBox = document.getElementsByClassName("choiceBtns")[0];
+        let marginTop = parseInt(window.getComputedStyle(choiceButtonBox).marginTop.split("p")[0]);
+        let subtaskCount = document.getElementsByClassName("subtask").length;
+
+        if (e.target.parentNode.parentNode.childElementCount == 1){
+          alert("Cannot remove last sub-task.. Leave empty if not needed!")
+        } else {
+          e.target.parentNode.parentNode.removeChild(e.target.parentNode)
+          if (subtaskCount < 5){
+            choiceButtonBox.style.marginTop = `${marginTop + 70}`;
+          };
+        };
+      };
+
+      // adds an event listener to the starting subtask
+      document.getElementsByClassName("subtask-container")[0].addEventListener("mouseenter", addDelete, event)
+      document.getElementsByClassName("subtask-container")[0].addEventListener("mouseleave", removeDelete, event)
+      
+
+  </script>
+</body>
+</html>

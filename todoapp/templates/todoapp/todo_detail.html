@@ -1,0 +1,159 @@
+{% load static %}
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Details of a todo</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+  <link rel="stylesheet" href="{% static "todoapp/details.css" %}">
+
+</head>
+<body>
+  <header>
+    <h1>{{ object.content }}</h1>
+  </header>
+    <form method="POST" class="todo-form">
+      {% csrf_token %}
+      <div class="details">
+        <div class="dates">
+          <p>Start: {{ object.date_created }}</p>
+          <p>End: {{ object.date_end }}</p>
+          <p>Time left:  {{ timeStr }} </p>
+        </div>
+        <label class="details-label">Details:</label>
+        <textarea class="details-field" name="details"
+        value="{{ current_name }}" id="details">{{ object.details }}</textarea>
+
+        <label for="content" class="subtask-label">Sub-tasks:</label>
+        <div class="subtasks">
+          {% for subtask in subtasks%}
+            <div class="subtask-container">
+              <div class="num" id="num">•</div>
+              <input type="text" class="form-control form-control-lg subtask"
+                maxlength="45" id="subtask"
+                autocomplete="off" autofocus spellcheck="false"
+                placeholder="Sub-tasks to complete the task.." value="{{ subtask.content }}" name="subtask">
+            </div>
+          {% endfor %}
+        </div>
+
+        <div class="add-sub">
+          <div onclick="subTaskAdd()">
+            +
+          </div>
+        </div>
+
+        <div class="choiceBtns">
+          <a href="{% url "todo:home" %}"class="back-btn"><div>Back</div></a>
+          <input type="submit" value="Edit" class="addBtn">
+        </div>
+
+    
+    </form>
+    <script>
+      // subtask button add
+      function subTaskAdd(){
+        let parent = document.getElementsByClassName("subtasks")[0];
+        let labelNums = document.querySelectorAll(".num")[0];
+        let subtaskBox = document.getElementsByClassName("subtask")[0];
+        let subtaskContainer = document.getElementsByClassName("subtask-container");
+
+        // to remove the animation delay that is at the start
+        subtaskBox.style.animationDelay = "0.3s";
+        labelNums.style.animationDelay = "0.3s";
+
+        // clones the objects and inserts them
+        let newLabel = labelNums.cloneNode(true);
+        let newBox = subtaskBox.cloneNode(true);
+        newBox.value = ""
+
+        // the container that contains the whole todo dot + box + remove btn
+        let newContainer = subtaskContainer[0].cloneNode(true);
+        newContainer.innerHTML = '';
+        
+        // event listeners for the delete button
+        newContainer.addEventListener("mouseenter", addDeleteBtn, event);
+        newContainer.addEventListener("mouseleave", removeDeleteBtn, event);
+        
+        // appending everything to the code
+        parent.appendChild(newContainer);
+        newContainer.appendChild(newLabel);
+        newContainer.appendChild(newBox);
+
+        // changes margin so the buttons are only pushed when the todos reaches them
+        let choiceButtonBox = document.getElementsByClassName("choiceBtns")[0];
+        let marginTop = parseInt(window.getComputedStyle(choiceButtonBox).marginTop.split("p")[0]);
+
+        // stops decreasing the margin if it hits the button container
+        if (marginTop - 70 < 0){
+          choiceButtonBox.style.margin = "0px"
+        } else {
+          choiceButtonBox.style.margin = `${marginTop - 70} 0 0 0`
+        };
+
+      };
+
+      // adds x for each button that is hovered on
+      function addDeleteBtn(e){
+        let deleteSubBtn = document.createElement("div"); // creates the x instance
+        deleteSubBtn.className = "delete-sub-btn";
+        
+        // adds event listener to remove the subtask
+        deleteSubBtn.addEventListener("click", deleteSub, event)
+
+        e.target.appendChild(deleteSubBtn); // adds the instance 
+      };
+
+      // removes the delete instance
+      function removeDeleteBtn(e){
+        // gets the target that is hovered on and removes the last child (x)
+        e.target.removeChild(e.target.lastChild); 
+      };
+      
+      // Deletes the subtask that is selected
+      function deleteSub(e){
+        // changes margin so the buttons are only pushed when the todos reaches them
+        let choiceButtonBox = document.getElementsByClassName("choiceBtns")[0];
+        let marginTop = parseInt(window.getComputedStyle(choiceButtonBox).marginTop.split("p")[0]);
+        let subtaskCount = document.getElementsByClassName("subtask").length;
+
+        if (e.target.parentNode.parentNode.childElementCount == 1){
+          alert("Cannot remove last sub-task.. Leave empty if not needed!") // at least 1 subtask
+        } else {
+            e.target.parentNode.parentNode.removeChild(e.target.parentNode)
+            if (subtaskCount < 5){
+            choiceButtonBox.style.marginTop = `${marginTop + 70}`;
+          };
+        };
+
+      };
+
+      // adds an event listener to the starting subtasks
+      let subtasks = document.getElementsByClassName("subtask-container");
+      for (let subtask of subtasks){
+        subtask.addEventListener("mouseenter", addDeleteBtn, event);
+        subtask.addEventListener("mouseleave", removeDeleteBtn, event);
+      }
+      
+      // For the page that it does not alert on refresh
+      if ( window.history.replaceState ) {
+      window.history.replaceState( null, null, window.location.href );
+      };
+
+      // aligns the choice button margin accordingly on load
+      let choiceButtonBox = document.getElementsByClassName("choiceBtns")[0];
+      let marginTop = parseInt(window.getComputedStyle(choiceButtonBox).marginTop.split("p")[0]);
+      let subtaskCount = document.getElementsByClassName("subtask").length;
+
+      if (subtaskCount > 1){
+          if (marginTop - 70 * subtaskCount < 0){
+          choiceButtonBox.style.marginTop = "0px";
+        } else {
+          choiceButtonBox.style.marginTop = `${marginTop - 70 * subtaskCount}`
+        };
+      };
+      
+    </script>
+</body>
+</html>
